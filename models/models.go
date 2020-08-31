@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
 	"log"
 
 	"cblog/pkg/setting"
@@ -26,12 +27,15 @@ func init() {
 		setting.DatabaseSetting.Host,
 		setting.DatabaseSetting.Name,
 		setting.DatabaseSetting.Charset)
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatalf("models.Init err: %v", err)
 	}
+
 	// table migrate
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&User{}, &Tag{}, &Article{})
 
 	// modify Callback
 	//db.Callback().Create().Replace("gorm:create", updateStampForCreateCallback)
