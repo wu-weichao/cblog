@@ -61,3 +61,31 @@ func AddTag(data map[string]interface{}) (*Tag, error) {
 	}
 	return &tag, nil
 }
+
+func UpdateTag(id int, data map[string]interface{}) (*Tag, error) {
+	tag := Tag{
+		Name:        data["name"].(string),
+		Flag:        data["flag"].(string),
+		Avatar:      data["avatar"].(string),
+		Description: data["description"].(string),
+		Status:      data["status"].(int),
+	}
+	err := db.Model(&Tag{}).Select("name", "flag", "avatar", "description", "status", "updated_at").Where("id = ?", id).Updates(tag).Error
+	if err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}
+
+func DeleteTag(id int) (bool, error) {
+	tag := Tag{
+		Model: Model{
+			ID: id,
+		},
+	}
+	err := db.Delete(&tag).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

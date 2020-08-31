@@ -41,7 +41,7 @@ func GetTag(c *gin.Context) {
 
 	id := c.Param("id")
 	tagService := service.Tag{
-		Id: com.StrTo(id).MustInt(),
+		ID: com.StrTo(id).MustInt(),
 	}
 	tag, err := tagService.GetById()
 	if err != nil {
@@ -49,7 +49,7 @@ func GetTag(c *gin.Context) {
 		return
 	}
 
-	controller.Success("", tag)
+	controller.Success(tag, "")
 }
 
 type TagForm struct {
@@ -65,7 +65,8 @@ func CreateTag(c *gin.Context) {
 
 	var tagForm TagForm
 	if err := c.ShouldBind(&tagForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		controller.Error(http.StatusBadRequest, err.Error(), nil)
+		return
 	}
 
 	tagService := service.Tag{
@@ -88,14 +89,66 @@ func CreateTag(c *gin.Context) {
 		return
 	}
 
-	controller.Success("标签添加成功", tag)
-	//c.JSON(http.StatusOK, gin.H{"error": "标签添加失败"})
+	controller.Success(tag, "")
 }
 
 func UpdateTag(c *gin.Context) {
+	controller := controllers.Controller{C: c}
 
+	var tagForm TagForm
+	if err := c.ShouldBind(&tagForm); err != nil {
+		controller.Error(http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	id := com.StrTo(c.Param("id")).MustInt()
+	tagService := service.Tag{
+		ID:          id,
+		Name:        tagForm.Name,
+		Flag:        tagForm.Flag,
+		Avatar:      tagForm.Avatar,
+		Description: tagForm.Description,
+		Status:      tagForm.Status,
+	}
+	// 判断记录是否存在
+	existTag, _ := tagService.GetById()
+	if existTag == nil {
+		controller.Error(http.StatusBadRequest, "标签不存在", nil)
+		return
+	}
+	// 判断标签是否重复
+	if tagForm.Flag != existTag.Flag {
+		flagTag, _ := tagService.GetByFlag()
+		if flagTag != nil {
+			controller.Error(http.StatusBadRequest, "标签已存在", nil)
+			return
+		}
+	}
+	// 更新
+	tag, err := tagService.Update()
+	if err != nil {
+		controller.Error(http.StatusBadRequest, "更新成功", nil)
+		return
+	}
+	controller.Success(tag, "")
 }
 
 func DeleteTag(c *gin.Context) {
+	controller := controllers.Controller{C: c}
+	id := com.StrTo(c.Param("id")).MustInt()
+	tagService := service.Tag{
+		ID: id,
+	}
+	_, err := tagService.GetById()
+	if err != nil {
+		controller.Error(http.StatusBadRequest, "标签不存在", nil)
+		return
+	}
+	result, err := tagService.Delete()
+	if err != nil || result == false {
+		controller.Error(http.StatusBadRequest, "标签删除失败", nil)
+		return
+	}
 
+	controller.Success(id, "操作成功")
 }

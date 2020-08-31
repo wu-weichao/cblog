@@ -28,7 +28,10 @@ type Pagination struct {
 	Total    int64
 }
 
-func (this *Controller) Success(message string, data interface{}) {
+func (this *Controller) Success(data interface{}, message string) {
+	if message == "" {
+		message = "操作成功"
+	}
 	this.C.JSON(http.StatusOK, Response{
 		Code:    http.StatusOK,
 		Message: message,

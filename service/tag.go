@@ -5,7 +5,7 @@ import (
 )
 
 type Tag struct {
-	Id          int
+	ID          int
 	Name        string
 	Flag        string
 	Avatar      string
@@ -32,7 +32,7 @@ func (this *Tag) GetByFlag() (*models.Tag, error) {
 }
 
 func (this *Tag) GetById() (*models.Tag, error) {
-	return models.GetTagById(this.Id)
+	return models.GetTagById(this.ID)
 }
 
 func (this *Tag) Add() (*models.Tag, error) {
@@ -44,4 +44,19 @@ func (this *Tag) Add() (*models.Tag, error) {
 		"status":      this.Status,
 	}
 	return models.AddTag(data)
+}
+
+func (this *Tag) Update() (*models.Tag, error) {
+	data := map[string]interface{}{
+		"name":        this.Name,
+		"flag":        this.Flag,
+		"avatar":      this.Avatar,
+		"description": this.Description,
+		"status":      this.Status,
+	}
+	return models.UpdateTag(this.ID, data)
+}
+
+func (this *Tag) Delete() (bool, error) {
+	return models.DeleteTag(this.ID)
 }
