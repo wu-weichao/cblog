@@ -2,6 +2,7 @@ package routers
 
 import (
 	"cblog/controllers/v1"
+	"cblog/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,22 +26,28 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 	//apiv1.Use(gin.ErrorLogger())
 	{
-		apiv1.GET("/register", v1.Register)
-		apiv1.GET("/login", v1.Login)
+		apiv1.POST("/register", v1.Register)
+		apiv1.POST("/login", v1.Login)
 		apiv1.GET("/logout", v1.Logout)
-		apiv1.GET("/users/:id", v1.GetUser)
 
-		apiv1.GET("/articles/", v1.GetArticles)
-		apiv1.GET("/articles/:id", v1.GetArticle)
-		apiv1.POST("/articles", v1.CreateArticle)
-		apiv1.PUT("/articles/:id", v1.UpdateArticle)
-		apiv1.DELETE("/articles/:id", v1.DeleteArticle)
+		apiv1Authorized := apiv1.Group("")
+		apiv1Authorized.Use(middleware.JwtAuth())
+		{
+			apiv1Authorized.GET("/users/:id", v1.GetUser)
+		}
+		//apiv1.GET("/users/:id", v1.GetUser)
 
-		apiv1.GET("/tags/", v1.GetTags)
-		apiv1.GET("/tags/:id", v1.GetTag)
-		apiv1.POST("/tags", v1.CreateTag)
-		apiv1.PUT("/tags/:id", v1.UpdateTag)
-		apiv1.DELETE("/tags/:id", v1.DeleteTag)
+		//apiv1.GET("/articles/", v1.GetArticles)
+		//apiv1.GET("/articles/:id", v1.GetArticle)
+		//apiv1.POST("/articles", v1.CreateArticle)
+		//apiv1.PUT("/articles/:id", v1.UpdateArticle)
+		//apiv1.DELETE("/articles/:id", v1.DeleteArticle)
+		//
+		//apiv1.GET("/tags/", v1.GetTags)
+		//apiv1.GET("/tags/:id", v1.GetTag)
+		//apiv1.POST("/tags", v1.CreateTag)
+		//apiv1.PUT("/tags/:id", v1.UpdateTag)
+		//apiv1.DELETE("/tags/:id", v1.DeleteTag)
 	}
 
 	return r

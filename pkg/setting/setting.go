@@ -10,6 +10,7 @@ import (
 // app config
 type App struct {
 	JwtSecret string
+	JwtTtl    int
 	PageSize  int
 }
 
