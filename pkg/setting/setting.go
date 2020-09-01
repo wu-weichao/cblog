@@ -39,6 +39,14 @@ type Database struct {
 
 var DatabaseSetting = &Database{}
 
+// log config
+type Log struct {
+	Path  string
+	Level int
+}
+
+var LogSetting = &Log{}
+
 func init() {
 	cfg, err := ini.Load("config/app.ini")
 	if err != nil {
@@ -49,6 +57,7 @@ func init() {
 	MapTo(cfg, "app", AppSetting)
 	MapTo(cfg, "server", ServerSetting)
 	MapTo(cfg, "database", DatabaseSetting)
+	MapTo(cfg, "log", LogSetting)
 
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
 	ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second

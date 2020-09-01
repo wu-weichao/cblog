@@ -19,6 +19,8 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	// Recovery 中间件会 recover 任何 panic。如果有 panic 的话，会写入 500。
 	r.Use(gin.Recovery())
+	// 日志记录
+	r.Use(middleware.LoggerToFile())
 
 	// 静态资源路由
 
