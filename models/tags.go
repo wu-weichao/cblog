@@ -3,6 +3,8 @@ package models
 type Tag struct {
 	Model
 
+	Articles []Article `gorm:"many2many:tag_articles"`
+
 	Name        string `gorm:"size:100;comment:名称" json:"name"`
 	Flag        string `gorm:"index;size:50;comment:标识" json:"flag"`
 	Avatar      string `gorm:"size:512;comment:图标" json:"avatar"`
