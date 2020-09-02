@@ -4,7 +4,6 @@ import (
 	"cblog/controllers"
 	"cblog/models"
 	"cblog/service"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/unknwon/com"
 	"net/http"
@@ -40,7 +39,6 @@ func GetTags(c *gin.Context) {
 
 	tags, total, err := tagService.GetAll(controller.Offset, controller.Limit)
 	if err != nil {
-		fmt.Printf("GetTags Error: %v", err)
 		controller.Error(http.StatusBadRequest, "查询失败，请稍后再试", nil)
 		return
 	}

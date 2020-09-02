@@ -2,6 +2,7 @@ package service
 
 import (
 	"cblog/models"
+	"strings"
 )
 
 type Tag struct {
@@ -13,7 +14,20 @@ type Tag struct {
 	Status      int
 }
 
-func (this *Tag) GetAll(offset, limit int) ([]*models.Tag, int64, error) {
+func (this *Tag) CheckIdExists(ids string) bool {
+	idArr := strings.Split(ids, ",")
+
+	maps := make(map[string]interface{})
+	maps["id in ?"] = idArr
+	count, _ := models.GetTagsCount(maps)
+
+	if len(idArr) == int(count) {
+		return true
+	}
+	return false
+}
+
+func (this *Tag) GetAll(offset, limit int) (tags []*models.Tag, count int64, err error) {
 	maps := make(map[string]interface{})
 	if this.Name != "" {
 		maps["name LIKE ?"] = "%" + this.Name + "%"
@@ -22,9 +36,19 @@ func (this *Tag) GetAll(offset, limit int) ([]*models.Tag, int64, error) {
 		maps["flag LIKE ?"] = "%" + this.Flag + "%"
 	}
 	if this.Status != -1 {
-		maps["status"] = this.Status
+		maps["status = ?"] = this.Status
 	}
-	return models.GetTags(offset, limit, maps)
+
+	tags, err = models.GetTags(offset, limit, maps)
+	if err != nil {
+		return
+	}
+	count, err = models.GetTagsCount(maps)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func (this *Tag) GetByFlag() (*models.Tag, error) {
