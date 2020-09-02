@@ -2,16 +2,19 @@ package routers
 
 import (
 	"cblog/controllers/v1"
+	_ "cblog/docs"
 	"cblog/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
-
-func Test(ctx *gin.Context) {
-
-}
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
+
+	// swagger 文档  "http://ip:port/swagger/index.html"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	//r.GET("/swagger/*any", ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 
 	// 全局中间件
 	// Logger 中间件将日志写入 gin.DefaultWriter，即使你将 GIN_MODE 设置为 release。
@@ -45,11 +48,11 @@ func InitRouter() *gin.Engine {
 		//apiv1.PUT("/articles/:id", v1.UpdateArticle)
 		//apiv1.DELETE("/articles/:id", v1.DeleteArticle)
 		//
-		//apiv1.GET("/tags/", v1.GetTags)
-		//apiv1.GET("/tags/:id", v1.GetTag)
-		//apiv1.POST("/tags", v1.CreateTag)
-		//apiv1.PUT("/tags/:id", v1.UpdateTag)
-		//apiv1.DELETE("/tags/:id", v1.DeleteTag)
+		apiv1.GET("/tags", v1.GetTags)
+		apiv1.GET("/tags/:id", v1.GetTag)
+		apiv1.POST("/tags", v1.CreateTag)
+		apiv1.PUT("/tags/:id", v1.UpdateTag)
+		apiv1.DELETE("/tags/:id", v1.DeleteTag)
 	}
 
 	return r

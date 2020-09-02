@@ -12,6 +12,9 @@ import (
 	"cblog/routers"
 )
 
+// @title cblog
+// @version 1.0
+// @description 基于gin的...
 func main() {
 	// debug or release
 	gin.SetMode(setting.ServerSetting.RunMode)

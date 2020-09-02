@@ -10,6 +10,18 @@ import (
 	"net/http"
 )
 
+// @Tags 文章标签
+// @Summary 获取标签列表
+// @Accept  json
+// @Produce  json
+// @Param   name     query    string     false    "标签名称"
+// @Param   flag     query    string     false    "标签flag"
+// @Param   status     query    int     false    "标签状态"
+// @Param   page     query    int     false    "页数"
+// @Param   page_size     query    int     false    "分页条数"
+// @Success 200 {string} json "{"code":200,"msg":"","data":[]}}"
+// @Failure 400 {string} json "{"code":400,"msg":"","data":""}}"
+// @Router /api/v1/tags [get]
 func GetTags(c *gin.Context) {
 	controller := controllers.Controller{C: c}
 	controller.SetPage()
@@ -36,6 +48,15 @@ func GetTags(c *gin.Context) {
 	controller.Paginate(tags, total)
 }
 
+// @Tags 文章标签
+// @Summary 获取标签详情
+// @Description 通过标签ID获取标签信息
+// @Accept  json
+// @Produce  json
+// @Param   tag_id     path    int     true    "标签 ID"
+// @Success 200 {string} json "{"code":200,"msg":"","data":{}}"
+// @Failure 400 {string} json "{"code":400,"msg":"","data":""}}"
+// @Router /api/v1/tags/{tag_id} [get]
 func GetTag(c *gin.Context) {
 	controller := controllers.Controller{C: c}
 
@@ -60,6 +81,18 @@ type TagForm struct {
 	Status      int    `form:"status" json:"status" binding:"oneof=0 1"`
 }
 
+// @Tags 文章标签
+// @Summary 新增标签
+// @Accept  json
+// @Produce  json
+// @Param   name     formData    string     true    "标签名称"
+// @Param   flag     formData    string     true    "标签标识"
+// @Param   avatar     formData    string     false    "标签图标"
+// @Param   description     formData    string     false    "标签描述"
+// @Param   status     formData    int     false    "标签状态 1:正常 0:禁用"
+// @Success 200 {string} json "{"code":200,"msg":"","data":{}}"
+// @Failure 400 {string} json "{"code":400,"msg":"","data":""}}"
+// @Router /api/v1/tags [post]
 func CreateTag(c *gin.Context) {
 	controller := controllers.Controller{C: c}
 
@@ -92,6 +125,20 @@ func CreateTag(c *gin.Context) {
 	controller.Success(tag, "")
 }
 
+// @Tags 文章标签
+// @Summary 修改标签
+// @Description 通过标签ID修改标签
+// @Accept  json
+// @Produce  json
+// @Param   tag_id     path    int     true    "标签 ID"
+// @Param   name     formData    string     true    "标签名称"
+// @Param   flag     formData    string     true    "标签标识"
+// @Param   avatar     formData    string     false    "标签图标"
+// @Param   description     formData    string     false    "标签描述"
+// @Param   status     formData    int     false    "标签状态 1:正常 0:禁用"
+// @Success 200 {string} json "{"code":200,"msg":"","data":{}}"
+// @Failure 400 {string} json "{"code":400,"msg":"","data":""}}"
+// @Router /api/v1/tags/{tag_id} [put]
 func UpdateTag(c *gin.Context) {
 	controller := controllers.Controller{C: c}
 
@@ -133,6 +180,15 @@ func UpdateTag(c *gin.Context) {
 	controller.Success(tag, "")
 }
 
+// @Tags 文章标签
+// @Summary 删除标签
+// @Description 通过标签ID删除标签
+// @Accept  json
+// @Produce  json
+// @Param   tag_id     path    int     true    "标签 ID"
+// @Success 200 {string} json "{"code":200,"msg":"","data":""}"
+// @Failure 400 {string} json "{"code":400,"msg":"","data":""}}"
+// @Router /api/v1/tags/{tag_id} [delete]
 func DeleteTag(c *gin.Context) {
 	controller := controllers.Controller{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
