@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	_ "cblog/models"
-	_ "cblog/pkg/setting"
 	"cblog/routers"
 )
 

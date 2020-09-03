@@ -10,6 +10,7 @@ type Article struct {
 	Tags []Tag `gorm:"many2many:article_tags;references:" json:"tags"`
 
 	Title       string `gorm:"size:255;index;comment:标题" json:"title"`
+	Cover       string `gorm:"size:512;comment:封面" json:"cover"`
 	Description string `gorm:"size:512;comment:描述" json:"description"`
 	Content     string `gorm:"type:text;comment:内容" json:"content"`
 	View        int    `gorm:"comment:点击数" json:"view"`

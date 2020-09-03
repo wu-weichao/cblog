@@ -4,9 +4,11 @@ import (
 	"cblog/controllers/v1"
 	_ "cblog/docs"
 	"cblog/middleware"
+	"cblog/pkg/setting"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"net/http"
 )
 
 func InitRouter() *gin.Engine {
@@ -26,6 +28,7 @@ func InitRouter() *gin.Engine {
 	r.Use(middleware.LoggerToFile())
 
 	// 静态资源路由
+	r.StaticFS("/static/uploads", http.Dir(setting.UploadSetting.Path))
 
 	// 动态路由
 	apiv1 := r.Group("/api/v1")
@@ -34,20 +37,21 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/register", v1.Register)
 		apiv1.POST("/login", v1.Login)
 		apiv1.GET("/logout", v1.Logout)
+		apiv1.POST("/upload", v1.UploadFile)
 
 		apiv1Authorized := apiv1.Group("")
 		apiv1Authorized.Use(middleware.JwtAuth())
 		{
 			apiv1Authorized.GET("/users/:id", v1.GetUser)
 		}
-		//apiv1.GET("/users/:id", v1.GetUser)
 
+		// 文章
 		apiv1.GET("/articles/", v1.GetArticles)
 		apiv1.GET("/articles/:id", v1.GetArticle)
 		apiv1.POST("/articles", v1.CreateArticle)
 		apiv1.PUT("/articles/:id", v1.UpdateArticle)
 		apiv1.DELETE("/articles/:id", v1.DeleteArticle)
-		//
+		// 文章标签
 		apiv1.GET("/tags", v1.GetTags)
 		apiv1.GET("/tags/:id", v1.GetTag)
 		apiv1.POST("/tags", v1.CreateTag)

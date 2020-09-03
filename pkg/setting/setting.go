@@ -47,6 +47,13 @@ type Log struct {
 
 var LogSetting = &Log{}
 
+// upload config
+type Upload struct {
+	Path string
+}
+
+var UploadSetting = &Upload{}
+
 func init() {
 	cfg, err := ini.Load("config/app.ini")
 	if err != nil {
@@ -58,6 +65,7 @@ func init() {
 	MapTo(cfg, "server", ServerSetting)
 	MapTo(cfg, "database", DatabaseSetting)
 	MapTo(cfg, "log", LogSetting)
+	MapTo(cfg, "upload", UploadSetting)
 
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
 	ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second
