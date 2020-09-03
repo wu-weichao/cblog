@@ -39,10 +39,10 @@ func (this *Article) GetAll(offset, limit int) (articles []*models.Article, coun
 	if err != nil {
 		return
 	}
-	//count, err = models.GetArticlesCount(maps)
-	//if err != nil {
-	//	return
-	//}
+	count, err = models.GetArticlesCount(maps)
+	if err != nil {
+		return
+	}
 
 	return
 }
@@ -62,4 +62,26 @@ func (this *Article) Add() (*models.Article, error) {
 		"status":      this.Status,
 	}
 	return models.AddArticle(data)
+}
+
+func (this *Article) Update() (*models.Article, error) {
+	var tags []models.Tag
+	for _, tagId := range strings.Split(this.Tags, ",") {
+		tempId, _ := strconv.Atoi(tagId)
+		tags = append(tags, models.Tag{Model: models.Model{ID: tempId}})
+	}
+
+	data := map[string]interface{}{
+		"id":          this.ID,
+		"tags":        tags,
+		"title":       this.Title,
+		"description": this.Description,
+		"content":     this.Content,
+		"status":      this.Status,
+	}
+	return models.UpdateArticle(data)
+}
+
+func (this *Article) Delete() (bool, error) {
+	return models.DeleteArticle(this.ID)
 }

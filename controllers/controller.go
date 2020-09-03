@@ -23,9 +23,9 @@ type Response struct {
 }
 
 type Pagination struct {
-	Page     int
-	PageSize int
-	Total    int64
+	Page     int   `json:"page"`
+	PageSize int   `json:"page_size"`
+	Total    int64 `json:"total"`
 }
 
 func (this *Controller) Success(data interface{}, message string) {
@@ -54,6 +54,8 @@ func (this *Controller) Error(code int, message string, data interface{}) {
 
 func (this *Controller) Paginate(data interface{}, total int64) {
 	this.Pagination.Total = total
+	this.Pagination.Total = total
+	this.Pagination.Total = total
 	this.C.JSON(http.StatusOK, Response{
 		Code:    http.StatusOK,
 		Message: "操作成功",
@@ -74,6 +76,8 @@ func (this *Controller) SetPage() {
 	if pageSize == 0 {
 		pageSize = setting.AppSetting.PageSize
 	}
+	this.Pagination.Page = page
+	this.Pagination.PageSize = pageSize
 
 	this.Limit = pageSize
 	this.Offset = (page - 1) * pageSize

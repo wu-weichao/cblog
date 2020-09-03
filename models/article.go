@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +22,6 @@ func GetArticles(offset, limit int, maps map[string]interface{}) (articles []*Ar
 		result := make(map[string]interface{})
 		db.Table("article_tags").Select("article_id").Where("tag_id in ?", maps["tags"]).Find(&result)
 
-		fmt.Printf("resultresultresult: %v \r\n", result)
 		for _, aid := range result {
 			articleIds = append(articleIds, int(aid.(int64)))
 		}
@@ -40,37 +38,30 @@ func GetArticles(offset, limit int, maps map[string]interface{}) (articles []*Ar
 		return nil, err
 	}
 
-	//for query, args := range maps {
-	//	if query != "tags" {
-	//		tagDb.Where(query, args)
-	//	}
-	//}
-	//if maps["tags"] != nil {
-	//	tagDb.Preload("Tags", func(db *gorm.DB) *gorm.DB {
-	//		return db.Where("id in ?", maps["tags"])
-	//	})
-	//} else {
-	//	tagDb.Preload("Tags")
-	//}
-
-	//err := tagDb.Offset(offset).Limit(limit).Find(&articles).Error
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	return
 }
 
 func GetArticlesCount(maps map[string]interface{}) (count int64, err error) {
-	//tagDb := db.Model(&Tag{})
-	//for query, args := range maps {
-	//	tagDb.Where(query, args)
-	//}
-	//var count int64
-	//err := tagDb.Count(&count).Error
-	//if err != nil {
-	//	return 0, err
-	//}
+	if maps["tags"] != nil {
+		var articleIds []int
+		result := make(map[string]interface{})
+		db.Table("article_tags").Select("article_id").Where("tag_id in ?", maps["tags"]).Find(&result)
+
+		for _, aid := range result {
+			articleIds = append(articleIds, int(aid.(int64)))
+		}
+		maps["id in ?"] = articleIds
+		delete(maps, "tags")
+	}
+
+	tagDb := db.Model(&Article{}).Preload("Tags")
+	for query, args := range maps {
+		tagDb.Where(query, args)
+	}
+	err = tagDb.Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
 	return
 }
 
@@ -100,4 +91,50 @@ func AddArticle(data map[string]interface{}) (*Article, error) {
 		return nil, err
 	}
 	return &article, nil
+}
+
+func UpdateArticle(data map[string]interface{}) (*Article, error) {
+	var article Article
+	err := db.First(&article, data["id"]).Error
+	if err != nil {
+		return nil, err
+	}
+	tx := db.Begin()
+	article.Title = data["title"].(string)
+	article.Description = data["description"].(string)
+	article.Content = data["content"].(string)
+	article.Status = data["status"].(int)
+	if err := tx.Save(&article).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	// 更新关联关系
+	if err := tx.Model(&article).Association("Tags").Replace(data["tags"].([]Tag)); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	tx.Commit()
+
+	return &article, nil
+}
+
+func DeleteArticle(id int) (bool, error) {
+	article := Article{
+		Model: Model{
+			ID: id,
+		},
+	}
+	tx := db.Begin()
+	if err := tx.Delete(&article).Error; err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	if err := tx.Model(&article).Association("Tags").Clear(); err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	tx.Commit()
+
+	return true, nil
 }
